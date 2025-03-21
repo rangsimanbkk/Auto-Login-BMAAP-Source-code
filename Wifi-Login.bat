@@ -15,5 +15,5 @@ IF %ERRORLEVEL% EQU 0 (
     python C:\Auto-Login-BMAAP\Wifi-Login.py
 )
 
-timeout /t 10 /nobreak >nul
+timeout /t 60 /nobreak >nul
 goto CHECK_CONNECTION
