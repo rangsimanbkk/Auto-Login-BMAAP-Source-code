@@ -2,3 +2,5 @@ dist/
 build/
 edit-config-encrypt.spec
 Login-encrypt.spec
+Log/
+config/
