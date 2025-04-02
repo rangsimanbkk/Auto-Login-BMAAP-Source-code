@@ -24,9 +24,24 @@
 
 ![Main](https://github.com/rangsimanbkk/Auto-Login-BMAAP/blob/pic/Main.png?raw=true)
 
-4️⃣
+4️⃣ เข้าในโฟลเดอร์ Auto-Login-BMAAP รัน Setup.bat
+
+![Setup](https://github.com/rangsimanbkk/Auto-Login-BMAAP/blob/pic/Setup.png?raw=true)
+
+5️⃣ เมื่อทำการติดตั้งเสร็จจะได้หน้าจอตามภาพ กดอะไรก็ได้เพื่อปิด หลังจากนั้นให้รีสตาร์ทเครื่อง
+
+![Setup-Complete](https://github.com/rangsimanbkk/Auto-Login-BMAAP/blob/pic/Setup-Complete.png?raw=true)
+
+6️⃣ เมื่อเปิดเครื่องมาใหม่โปรแกรมจะให้กรอก Username และ Password สำหรับ Login Wi-Fi BMAAP (กรอกครั้งแรกครั้งเดียว) ระบบจะใช้เวลาล็อคอิน 1-3 นาที
+
+![Login](https://github.com/rangsimanbkk/Auto-Login-BMAAP/blob/pic/Login.png?raw=true)
+
+7️⃣ หากต้องการแก้ไข Username และ Password ให้เปิด edit-config-encrypt.exe ในโฟลเดอร์ Auto-Login-BMAAP
+
+![Edit](https://github.com/rangsimanbkk/Auto-Login-BMAAP/blob/pic/Edit.png?raw=true)
 
 
-5️⃣
+## ติดปัญหาสอบถามได้ที่
+Line: @373xybab 
 
-6️⃣
+<a href="https://lin.ee/164k6B8"><img src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png" alt="เพิ่มเพื่อน" height="36" border="0"></a>
