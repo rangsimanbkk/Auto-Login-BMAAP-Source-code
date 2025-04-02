@@ -86,18 +86,18 @@ def login(username, password):
 def prompt_credentials():
     root = tk.Tk()
     root.title("Enter Login Credentials")
-    root.geometry("250x180")
+    root.geometry("300x200")  # Increased width for button alignment
     root.resizable(False, False)
     
     root.update_idletasks()
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
-    x = (screen_width - 250) // 2
-    y = (screen_height - 180) // 2
-    root.geometry(f"250x180+{x}+{y}")
+    x = (screen_width - 300) // 2
+    y = (screen_height - 200) // 2
+    root.geometry(f"300x200+{x}+{y}")
     
     config = load_config()
-    
+
     tk.Label(root, text="Enter Username:", font=("Arial", 12)).pack(pady=5)
     username_entry = tk.Entry(root, font=("Arial", 12))
     username_entry.insert(0, config["username"])
@@ -109,7 +109,11 @@ def prompt_credentials():
     password_entry = tk.Entry(root, show='*', font=("Arial", 12))
     password_entry.insert(0, config["password"])
     password_entry.pack(pady=5)
-    
+
+    # Frame for button alignment
+    button_frame = tk.Frame(root)
+    button_frame.pack(pady=10)
+
     def save_and_exit(event=None):
         username = username_entry.get()
         password = password_entry.get()
@@ -119,13 +123,22 @@ def prompt_credentials():
             root.destroy()
         else:
             exit(0)
+
+    def close_and_exit():
+        root.destroy()
+        exit(0)
+
+    save_button = tk.Button(button_frame, text="Save", command=save_and_exit, font=("Arial", 12), width=10)
+    save_button.pack(side=tk.LEFT, padx=5)
+
+    close_button = tk.Button(button_frame, text="Close", command=close_and_exit, font=("Arial", 12), width=10)
+    close_button.pack(side=tk.RIGHT, padx=5)
     
-    save_button = tk.Button(root, text="Save", command=save_and_exit, font=("Arial", 12))
-    save_button.pack(pady=10)
-    
-    root.protocol("WM_DELETE_WINDOW", lambda: exit(0))
+    root.protocol("WM_DELETE_WINDOW", close_and_exit)  # Ensures script stops if window is closed
     root.bind('<Return>', save_and_exit)
     root.mainloop()
+
+
 
 def main():
     config = load_config()
