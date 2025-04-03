@@ -73,9 +73,13 @@ def check_internet():
 
 def login(username, password):
     data = {"username": username, "password": password}
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
     try:
         session = requests.Session()
-        response = session.post(LOGIN_URL, data=data, timeout=5)
+        response = session.post(LOGIN_URL, data=data, headers=headers, timeout=5)
         if response.status_code == 200:
             log_status("Login attempt successful")
         else:
