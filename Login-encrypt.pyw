@@ -3,6 +3,8 @@ import json
 import time
 import requests
 import tkinter as tk
+import platform
+import subprocess
 from tkinter import messagebox
 from cryptography.fernet import Fernet
 
@@ -13,6 +15,9 @@ LOG_FILE = os.path.join(LOG_DIR, "connection_log.txt")
 KEY_FILE = os.path.join(CONFIG_DIR, "key.key")
 LOGIN_URL = "http://securelogin.arubanetworks.com/cgi-bin/login"
 CHECK_URL = "https://www.google.com"
+
+# Configuration
+target_wifi_names = ["BMAAP"]  # Add any target SSIDs here
 
 os.makedirs(CONFIG_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -81,7 +86,7 @@ def login(username, password):
         session = requests.Session()
         response = session.post(LOGIN_URL, data=data, headers=headers, timeout=5)
         if response.status_code == 200:
-            log_status("Login attempt successful")
+            log_status("Login successful")
         else:
             log_status(f"Login failed: {response.status_code}")
     except requests.RequestException as e:
@@ -142,7 +147,33 @@ def prompt_credentials():
     root.bind('<Return>', save_and_exit)
     root.mainloop()
 
+def get_wifi_name():
+    os_type = platform.system()
 
+    try:
+        if os_type == "Windows":
+            output = subprocess.check_output("netsh wlan show interfaces", shell=True).decode()
+            for line in output.split('\n'):
+                if "SSID" in line and "BSSID" not in line:
+                    return line.split(":")[1].strip()
+
+        elif os_type == "Darwin":  # macOS
+            output = subprocess.check_output(
+                ["/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport", "-I"]
+            ).decode()
+            for line in output.split("\n"):
+                if " SSID" in line:
+                    return line.split(":")[1].strip()
+
+        elif os_type == "Linux":
+            output = subprocess.check_output(["iwgetid", "-r"]).decode().strip()
+            return output
+
+        else:
+            return None
+
+    except subprocess.CalledProcessError:
+        return None
 
 def main():
     config = load_config()
@@ -150,9 +181,18 @@ def main():
         prompt_credentials()
     
     while True:
-        if not check_internet():
-            login(config["username"], config["password"])
-        time.sleep(60)
+            # Get current Wi-Fi
+            current_wifi = get_wifi_name()
+            if current_wifi in target_wifi_names:
+                #if not check_internet():
+                if check_internet():
+                    log_status(f'Connected to Wi-Fi : "{current_wifi}". Internet OK.')
+                else:
+                    log_status(f'Connected to Wi-Fi : "{current_wifi}". No Internet.')
+                    login(config["username"], config["password"])
+            else:
+                log_status(f'Not connected to BMAAP. Skipping login.')
+            time.sleep(60)
 
 if __name__ == "__main__":
     main()
