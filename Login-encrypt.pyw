@@ -70,10 +70,8 @@ def log_status(status):
 def check_internet():
     try:
         requests.get(CHECK_URL, timeout=5)
-        log_status("Internet OK")
         return True
     except requests.RequestException:
-        log_status("No Internet")
         return False
 
 def login(username, password):
@@ -149,13 +147,19 @@ def prompt_credentials():
 
 def get_wifi_name():
     os_type = platform.system()
-
     try:
         if os_type == "Windows":
             output = subprocess.check_output("netsh wlan show interfaces", shell=True).decode()
-            for line in output.split('\n'):
-                if "SSID" in line and "BSSID" not in line:
-                    return line.split(":")[1].strip()
+            wifi_names = []
+            blocks = output.split("Name")  # Splits output by interfaces
+            for block in blocks:
+                for line in block.splitlines():
+                    if "SSID" in line and "BSSID" not in line:
+                        ssid = line.split(":", 1)[1].strip()
+                        if ssid:  # Avoid empty SSIDs
+                            wifi_names.append(ssid)
+                        break
+            return wifi_names
 
         elif os_type == "Darwin":  # macOS
             output = subprocess.check_output(
@@ -163,17 +167,16 @@ def get_wifi_name():
             ).decode()
             for line in output.split("\n"):
                 if " SSID" in line:
-                    return line.split(":")[1].strip()
+                    return [line.split(":")[1].strip()]
 
         elif os_type == "Linux":
             output = subprocess.check_output(["iwgetid", "-r"]).decode().strip()
-            return output
+            return [output] if output else []
 
         else:
-            return None
-
+            return []
     except subprocess.CalledProcessError:
-        return None
+        return []
 
 def main():
     config = load_config()
@@ -182,16 +185,20 @@ def main():
     
     while True:
             # Get current Wi-Fi
-            current_wifi = get_wifi_name()
-            if current_wifi in target_wifi_names:
-                #if not check_internet():
+            current_wifis = get_wifi_name()
+            matched_wifi = next((wifi for wifi in current_wifis if wifi in target_wifi_names), None)
+
+            if matched_wifi:
                 if check_internet():
-                    log_status(f'Connected to Wi-Fi : "{current_wifi}". Internet OK.')
+                    log_status(f'Connected to Wi-Fi : "{matched_wifi}". Internet OK.')
                 else:
-                    log_status(f'Connected to Wi-Fi : "{current_wifi}". No Internet.')
+                    log_status(f'Connected to Wi-Fi : "{matched_wifi}". No Internet.')
                     login(config["username"], config["password"])
+                    time.sleep(3)
+                    if check_internet():
+                        log_status(f'Internet OK.')
             else:
-                log_status(f'Not connected to BMAAP. Skipping login.')
+                log_status('Not connected to BMAAP. Skipping login.')
             time.sleep(60)
 
 if __name__ == "__main__":
